@@ -4,15 +4,15 @@ Comprehensive documentation for Python development in CRYENGINE 5.7, available i
 
 ## Contents
 
-### English (`en/`)
+### English
 | # | Document | Description |
 |---|----------|-------------|
-| 01 | [Getting Started](en/Python_in_Sandbox_01_Getting_Started.md) | Introduction to Python in CRYENGINE Sandbox |
-| 02 | [Running Scripts](en/Python_in_Sandbox_02_Running_Scripts.md) | How to execute Python scripts within the engine |
-| 03 | [API Reference](en/Python_in_Sandbox_03_API_Reference.md) | Complete API documentation |
-| 04 | [Third Party Packages](en/Python_in_Sandbox_04_Third_Party_Packages.md) | Using external Python packages |
-| 05 | [Plugin Development](en/Python_in_Sandbox_05_Plugin_Development.md) | Creating Python plugins for CRYENGINE |
-| 06 | [Advanced Topics](en/Python_in_Sandbox_06_Advanced.md) | Advanced Python integration and optimization |
+| 01 | [Getting Started](Python_in_Sandbox_01_Getting_Started.md) | Introduction to Python in CRYENGINE Sandbox |
+| 02 | [Running Scripts](Python_in_Sandbox_02_Running_Scripts.md) | How to execute Python scripts within the engine |
+| 03 | [API Reference](Python_in_Sandbox_03_API_Reference.md) | Complete API documentation |
+| 04 | [Third Party Packages](Python_in_Sandbox_04_Third_Party_Packages.md) | Using external Python packages |
+| 05 | [Plugin Development](Python_in_Sandbox_05_Plugin_Development.md) | Creating Python plugins for CRYENGINE |
+| 06 | [Advanced Topics](Python_in_Sandbox_06_Advanced.md) | Advanced Python integration and optimization |
 
 ### Traditional Chinese (`zh-tw/`)
 | # | 文件 | 說明 |
