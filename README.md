@@ -44,4 +44,4 @@ Comprehensive documentation for Python development in CRYENGINE 5.7, available i
 ## Requirements
 
 - CRYENGINE 5.7 or later
-- Python 3.6+
+- Python 3.7 (the version embedded by CRYENGINE 5.7)

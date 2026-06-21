@@ -12,7 +12,7 @@ Sandbox 提供多种方式执行 Python 代码：
 |------|------|----------|
 | Python Scripts 面板 | GUI 面板，浏览并执行 `.py` 文件 | 交互式操作 |
 | `general.run_file()` | 从 Python 或 Console 执行脚本文件 | 脚本内调用其他脚本 |
-| `general.run_file_parameters()` | 带参数执行脚本文件 | 需要传参数的脚本 |
+| `general.run_file_parameters()` | 以空白分隔参数执行脚本文件 | 需要简单参数的脚本 |
 | `general.execute_command()` | 执行编辑器命令 | 在 Python 中调用编辑器功能 |
 | `python.execute` | 直接执行 Python 字符串 | 简短代码片段 |
 | 插件自动载入 | 启动时自动执行 `startup.py` | 常驻插件 |
@@ -92,7 +92,7 @@ sandbox.general.run_file("C:/Projects/MyGame/Scripts/setup.py")
 
 ### 3.2 `general.run_file_parameters()`
 
-带参数执行脚本，参数以空白分隔。
+带参数执行脚本，参数以空白分隔。实现不做 shell 风格解析，因此包含空白的引号字符串仍会被拆开。
 
 ```python
 import sandbox
@@ -184,7 +184,7 @@ Editor/
     plugins/
       crytools/              ← 最先加载
         startup.py
-      my_plugin/             ← 之后按字母顺序加载
+      my_plugin/             ← 在 crytools 后加载（文件系统枚举顺序）
         startup.py
         helpers.py
         config.json
@@ -209,7 +209,7 @@ Sandbox 启动完成
     │      LoadPluginFromPath("Editor/Python/plugins/crytools")
     │      → 寻找 startup.py → 执行 general.run_file
     │
-    └── 3. 枚举其他子目录 (按字母顺序)
+    └── 3. 枚举其他子目录（文件系统枚举顺序）
            对每个子目录调用 LoadPluginFromPath()
            → 寻找 startup.py → 执行
 ```
@@ -284,7 +284,7 @@ sandbox.general.log("This goes to the editor console")
 print("This also appears in the console")
 
 # 方式三：general.draw_label（在 viewport 显示 2D 文字）
-sandbox.general.draw_label(100, 100, 1.0, 0.0, 0.0, 1.0, "Hello on screen")
+sandbox.general.draw_label(100, 100, 1.0, 1.0, 0.0, 0.0, 1.0, "Hello on screen")
 ```
 
 ### 6.2 输出重导机制
@@ -353,7 +353,8 @@ import sandbox
 for i in range(10):
     x = i * 5.0
     name = "Pillar_{:02d}".format(i)
-    sandbox.general.create_object("Brush", "Objects/pillar.cgf", name, (x, 0.0, 0.0))
+    obj = sandbox.general.create_object("Brush", "Objects/pillar.cgf", name, (x, 0.0, 0.0))
+    sandbox.general.log("Created " + obj.name)
 
 sandbox.general.log("Created 10 pillars")
 ```

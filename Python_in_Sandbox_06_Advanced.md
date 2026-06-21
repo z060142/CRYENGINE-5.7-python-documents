@@ -176,13 +176,13 @@ class TestMyFeature(unittest.TestCase):
     
     def test_create_object(self):
         """Test creating an object"""
-        name = sandbox.general.create_object("Brush", "Objects/box.cgf", 
-                                               "UnitTestObj", (0, 0, 0))
-        self.assertIsNotNone(name)
+        obj = sandbox.general.create_object("Brush", "Objects/box.cgf", 
+                                             "UnitTestObj", (0, 0, 0))
+        self.assertIsNotNone(obj)
         
         # Verify object exists
         objects = sandbox.object.get_all_objects("Brush")
-        self.assertIn("UnitTestObj", objects)
+        self.assertIn(obj.name, objects)
         
         # Cleanup
         sandbox.object.delete("UnitTestObj")
@@ -412,7 +412,7 @@ print("This goes to both console and log file")
 
 ## 5. Standalone Python Launcher
 
-The Sandbox source code includes a standalone Python launcher for executing Python scripts outside of Sandbox.
+The Sandbox source code includes a standalone Python launcher target for executing Python scripts outside of Sandbox when that target is built.
 
 ### 5.1 Source Code
 
@@ -422,7 +422,7 @@ The Sandbox source code includes a standalone Python launcher for executing Pyth
 
 - Sets Python Home to `../../Editor/Python/windows`
 - Directly calls `Py_Main(argc, pArgv)`
-- Can execute Python scripts without launching the full Sandbox
+- Can execute Python scripts without launching the full Sandbox, if `SandboxPython.exe` is built from this source tree
 
 ### 5.3 Usage
 
@@ -431,7 +431,7 @@ The Sandbox source code includes a standalone Python launcher for executing Pyth
 SandboxPython.exe my_script.py
 ```
 
-> **Limitation:** This launcher does not load the `sandbox` module, so `sandbox.*` commands cannot be used. It only provides a standard Python 3.7 environment, suitable for running standalone data processing scripts.
+> **Limitation:** This launcher does not load the `sandbox` module or initialize editor APIs. It sets `PYTHONHOME` to the embedded Python directory and is suitable for standalone Python 3.7 scripts that do not call `sandbox.*`.
 
 ---
 

@@ -70,6 +70,9 @@ sandbox.selection.get_count()           # selection module
 | `ui_action` | Menu and toolbar actions |
 | `python` | Python code execution |
 | `pythoneditor` | Autocomplete file generation |
+| `flowgraph` | Flow Graph editor operations |
+| `layout` | Editor layout load/save/reset operations |
+| `terrain` | Terrain and terrain-layer commands |
 | `edit_mode` | Edit mode switching |
 | `meshimporter` | Mesh import |
 | `group` | Group operations |
@@ -118,7 +121,7 @@ sandbox.general.create_level("NewLevel", 2048, 4.0, True)
 
 | Function | Signature | Description |
 |----------|-----------|-------------|
-| `create_object` | `general.create_object(str objectClass, str objectFile, str objectName, (float,float,float) position) → str` | Creates an object, returns the name |
+| `create_object` | `general.create_object(str objectClass, str objectFile, str objectName, (float,float,float) position) → PyGameObject` | Creates an object, returns a wrapped object |
 | `new_object` | `general.new_object(str entityType, str cgfName, str entityName, float x, float y, float z) → str` | Creates a new object (legacy interface) |
 | `new_object_at_cursor` | `general.new_object_at_cursor(str entityType, str cgfName, str entityName) → str` | Creates an object at cursor position |
 | `start_object_creation` | `general.start_object_creation(str entityType, str cgfName)` | Starts cursor-following object creation mode |
@@ -129,13 +132,14 @@ sandbox.general.create_level("NewLevel", 2048, 4.0, True)
 
 ```python
 # Create Brush
-name = sandbox.general.create_object("Brush", "Objects/box.cgf", "MyBox", (0, 0, 0))
+obj = sandbox.general.create_object("Brush", "Objects/box.cgf", "MyBox", (0, 0, 0))
+sandbox.general.log("Created: " + obj.name)
 
 # Create Entity
-name = sandbox.general.create_object("Entity", "", "MyEntity", (10, 10, 0))
+obj = sandbox.general.create_object("Entity", "", "MyEntity", (10, 10, 0))
 
 # Create TagPoint
-name = sandbox.general.create_object("TagPoint", "", "SpawnPoint1", (50, 50, 0))
+obj = sandbox.general.create_object("TagPoint", "", "SpawnPoint1", (50, 50, 0))
 ```
 
 ### 2.3 Console and CVar
@@ -228,7 +232,7 @@ sandbox.general.set_cvar("e_TimeOfDay", 14.5)
 | Function | Signature | Description |
 |----------|-----------|-------------|
 | `log` | `general.log(str message)` | Prints a message to the Console |
-| `draw_label` | `general.draw_label(int x, int y, float r, float g, float b, float a, str label)` | Draws 2D text in the viewport |
+| `draw_label` | `general.draw_label(int x, int y, float size, float r, float g, float b, float a, str label)` | Draws 2D text in the viewport |
 | `undo` | `general.undo()` | Undo |
 | `redo` | `general.redo()` | Redo |
 | `focus_level_editor` | `general.focus_level_editor()` | Focuses the level editor |
@@ -787,9 +791,30 @@ Provides action bindings for menus and toolbars.
 
 Generated files are located at: `%USERPROFILE%/Crytek/CRYENGINE_5.7/python/autocomplete/sandbox/`
 
+### flowgraph
+
+| Function | Signature | Description |
+|----------|-----------|-------------|
+| `open_view` | `flowgraph.open_view(str flowGraphName)` | Opens a named Flow Graph |
+| `open_view_and_select` | `flowgraph.open_view_and_select(str flowGraphName, str entityName)` | Opens a named Flow Graph and selects an entity node |
+
+### layout
+
+| Function | Signature | Description |
+|----------|-----------|-------------|
+| `load` | `layout.load(str path)` | Loads a layout from a file |
+| `save` | `layout.save(str absolutePath)` | Saves the current layout to a file |
+| `reset` | `layout.reset()` | Resets the layout |
+| `load_dlg` | `layout.load_dlg()` | Opens the load-layout dialog |
+| `save_as` | `layout.save_as()` | Opens the save-layout dialog |
+
 ---
 
 ## 20. Other Modules
+
+### terrain
+
+Terrain commands include `import_heightmap`, `export_heightmap`, `make_isle`, `remove_ocean`, `set_ocean_height`, `set_terrain_max_height`, `flatten_light`, `flatten_heavy`, `smooth`, `smooth_slope`, `smooth_beach_coast`, `normalize`, `reduce_range_light`, `reduce_range_heavy`, `erase_terrain`, `resize_terrain`, `invert_heightmap`, `generate_terrain`, `terrain_texture_dialog`, `reload_terrain`, `import_block`, `export_block`, `generate_terrain_texture`, `export_area`, `export_area_with_objects`, `select_terrain`, `export_layers`, `import_layers`, `create_layer`, `delete_layer`, `duplicate_layer`, `move_layer_to_top`, `move_layer_up`, `move_layer_down`, `move_layer_to_bottom`, `flood_layer`, and `refine_tiles`.
 
 ### edit_mode
 
@@ -858,7 +883,7 @@ Base class for all game objects. Obtained through functions like `sandbox.object
 | `bounds` | ((f,f,f),(f,f,f)) | ✓ | — | AABB bounding box |
 | `selected` | bool | ✓ | ✓ | Whether selected |
 | `grouped` | bool | ✓ | — | Whether in a group |
-| `visible` | bool | ✓ | ✓ | Whether visible |
+| `visible` | bool | ✓ | ✓ | Source behavior warning: in CRYENGINE 5.7.1 this property is backed by `IsHidden()` / `SetHidden()`, despite the Python property name |
 | `frozen` | bool | ✓ | ✓ | Whether frozen |
 
 | Method | Signature | Description |
@@ -1064,7 +1089,6 @@ Dynamic property wrapper. The value type is determined by `type`.
 | `eType_Vec3` | (float, float, float) |
 | `eType_Vec4` | (float, float, float, float) |
 | `eType_Color` | (float, float, float, float) |
-| `eType_Time` | float |
 
 ### 21.14 SPyWrappedClass
 
@@ -1163,3 +1187,4 @@ Mapping between C++ types and Python types:
 | [02 — Running Scripts](Python_in_Sandbox_02_Running_Scripts.md) | Panel usage, commands, plugin system |
 | [04 — Third Party Packages](Python_in_Sandbox_04_Third_Party_Packages.md) | How to install pip packages |
 | [05 — Plugin Development](Python_in_Sandbox_05_Plugin_Development.md) | In-depth plugin development guide |
+| `eType_Time` | internal time value (`hour`, `min`) |

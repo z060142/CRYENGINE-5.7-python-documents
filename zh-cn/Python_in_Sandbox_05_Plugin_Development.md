@@ -32,9 +32,9 @@ Editor/Python/plugins/
 ### 1.3 加载顺序
 
 1. `crytools` — 最先加载
-2. 其他插件目录 — 按字母顺序加载
+2. 其他插件目录 — 由文件系统枚举
 
-> **重要：** 如果你的插件依赖另一个插件，命名时要注意顺序（例如命名为 `z_my_plugin` 确保在最后加载）。
+> **重要：** 源码不会在加载前排序插件目录。如果你的插件依赖其他插件，请在 startup code 中明确处理依赖，不要依赖字母顺序。
 
 ---
 ## 2. 第一个插件
@@ -136,7 +136,8 @@ class PluginCore:
         for i in range(count):
             x = i * spacing
             name = "BatchObj_{:03d}".format(i)
-            sandbox.general.create_object("Brush", "Objects/box.cgf", name, (x, 0, 0))
+            obj = sandbox.general.create_object("Brush", "Objects/box.cgf", name, (x, 0, 0))
+            sandbox.general.log("Created " + obj.name)
         log("Created {} objects".format(count))
 ```
 
@@ -532,6 +533,28 @@ else:
 ```
 
 > **注意：** Sandbox 内建的 `_CryQt` 只暴露自定义 Qt 类（如 `QToolWindowManager`），不包含完整的 PySide2。要使用完整的 Qt API，需安装 PySide2（参见 [04 — 第三方套件](Python_in_Sandbox_04_Third_Party_Packages.md)）。
+
+若要将 PySide2 `QWidget` 子类注册为 Sandbox 面板，请使用 `SandboxBridge` helper：
+
+```python
+from PySide2 import QtWidgets
+import SandboxBridge
+
+class MyTool(QtWidgets.QWidget):
+    def __init__(self):
+        super(MyTool, self).__init__()
+        layout = QtWidgets.QVBoxLayout(self)
+        layout.addWidget(QtWidgets.QLabel("My Tool"))
+
+SandboxBridge.register_window(
+    MyTool,
+    "My Tool",
+    category="Python",
+    needs_menu_item=True,
+    menu_path="Python",
+    unique=True
+)
+```
 
 ### 7.3 使用对话框收集输入
 

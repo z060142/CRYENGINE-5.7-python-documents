@@ -13,7 +13,7 @@ Sandbox 提供多種方式執行 Python 程式碼：
 |------|------|----------|
 | Python Scripts 面板 | GUI 面板，瀏覽並執行 `.py` 檔案 | 互動式操作 |
 | `general.run_file()` | 從 Python 或 Console 執行腳本檔案 | 腳本內呼叫其他腳本 |
-| `general.run_file_parameters()` | 帶參數執行腳本檔案 | 需要傳參數的腳本 |
+| `general.run_file_parameters()` | 以空白分隔參數執行腳本檔案 | 需要簡單參數的腳本 |
 | `general.execute_command()` | 執行編輯器命令 | 在 Python 中呼叫編輯器功能 |
 | `python.execute` | 直接執行 Python 字串 | 簡短程式碼片段 |
 | 插件自動載入 | 啟動時自動執行 `startup.py` | 常駐插件 |
@@ -95,7 +95,7 @@ sandbox.general.run_file("C:/Projects/MyGame/Scripts/setup.py")
 
 ### 3.2 `general.run_file_parameters()`
 
-帶參數執行腳本，參數以空白分隔。
+帶參數執行腳本，參數以空白分隔。實作不做 shell 風格解析，因此包含空白的引號字串仍會被拆開。
 
 ```python
 import sandbox
@@ -189,7 +189,7 @@ Editor/
     plugins/
       crytools/              ← 最先載入
         startup.py
-      my_plugin/             ← 之後按字母順序載入
+      my_plugin/             ← 在 crytools 後載入（檔案系統列舉順序）
         startup.py
         helpers.py
         config.json
@@ -214,7 +214,7 @@ Sandbox 啟動完成
     │      LoadPluginFromPath("Editor/Python/plugins/crytools")
     │      → 尋找 startup.py → 執行 general.run_file
     │
-    └── 3. 列舉其他子目錄 (按字母順序)
+    └── 3. 列舉其他子目錄（檔案系統列舉順序）
            對每個子目錄呼叫 LoadPluginFromPath()
            → 尋找 startup.py → 執行
 ```
@@ -290,7 +290,7 @@ sandbox.general.log("This goes to the editor console")
 print("This also appears in the console")
 
 # 方式三：general.draw_label（在 viewport 顯示 2D 文字）
-sandbox.general.draw_label(100, 100, 1.0, 0.0, 0.0, 1.0, "Hello on screen")
+sandbox.general.draw_label(100, 100, 1.0, 1.0, 0.0, 0.0, 1.0, "Hello on screen")
 ```
 
 ### 6.2 輸出重導機制
@@ -360,7 +360,8 @@ import sandbox
 for i in range(10):
     x = i * 5.0
     name = "Pillar_{:02d}".format(i)
-    sandbox.general.create_object("Brush", "Objects/pillar.cgf", name, (x, 0.0, 0.0))
+    obj = sandbox.general.create_object("Brush", "Objects/pillar.cgf", name, (x, 0.0, 0.0))
+    sandbox.general.log("Created " + obj.name)
 
 sandbox.general.log("Created 10 pillars")
 ```

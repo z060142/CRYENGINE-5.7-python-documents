@@ -68,6 +68,9 @@ sandbox.selection.get_count()           # selection 模块
 | `ui_action` | 菜单与工具栏操作 |
 | `python` | Python 代码执行 |
 | `pythoneditor` | 自动完成文件生成 |
+| `flowgraph` | Flow Graph 编辑器操作 |
+| `layout` | 编辑器 layout 加载、保存、重置 |
+| `terrain` | 地形与地形图层命令 |
 | `edit_mode` | 编辑模式切换 |
 | `meshimporter` | 网格导入 |
 | `group` | 群组操作 |
@@ -113,7 +116,7 @@ sandbox.general.create_level("NewLevel", 2048, 4.0, True)
 
 | 函式 | 签名 | 说明 |
 |------|------|------|
-| `create_object` | `general.create_object(str objectClass, str objectFile, str objectName, (float,float,float) position) → str` | 建立对象，返回名称 |
+| `create_object` | `general.create_object(str objectClass, str objectFile, str objectName, (float,float,float) position) → PyGameObject` | 建立对象，返回包装对象 |
 | `new_object` | `general.new_object(str entityType, str cgfName, str entityName, float x, float y, float z) → str` | 建立新对象（旧版界面） |
 | `new_object_at_cursor` | `general.new_object_at_cursor(str entityType, str cgfName, str entityName) → str` | 在光标位置建立对象 |
 | `start_object_creation` | `general.start_object_creation(str entityType, str cgfName)` | 开始跟随光标的对象建立模式 |
@@ -124,13 +127,14 @@ sandbox.general.create_level("NewLevel", 2048, 4.0, True)
 
 ```python
 # 建立 Brush
-name = sandbox.general.create_object("Brush", "Objects/box.cgf", "MyBox", (0, 0, 0))
+obj = sandbox.general.create_object("Brush", "Objects/box.cgf", "MyBox", (0, 0, 0))
+sandbox.general.log("Created: " + obj.name)
 
 # 建立 Entity
-name = sandbox.general.create_object("Entity", "", "MyEntity", (10, 10, 0))
+obj = sandbox.general.create_object("Entity", "", "MyEntity", (10, 10, 0))
 
 # 建立 TagPoint
-name = sandbox.general.create_object("TagPoint", "", "SpawnPoint1", (50, 50, 0))
+obj = sandbox.general.create_object("TagPoint", "", "SpawnPoint1", (50, 50, 0))
 ```
 ### 2.3 Console 与 CVar
 
@@ -215,7 +219,7 @@ sandbox.general.set_cvar("e_TimeOfDay", 14.5)
 | 函数 | 签名 | 说明 |
 |------|------|------|
 | `log` | `general.log(str message)` | 印出信息到 Console |
-| `draw_label` | `general.draw_label(int x, int y, float r, float g, float b, float a, str label)` | 在 viewport 画 2D 文字 |
+| `draw_label` | `general.draw_label(int x, int y, float size, float r, float g, float b, float a, str label)` | 在 viewport 画 2D 文字 |
 | `undo` | `general.undo()` | 还原 |
 | `redo` | `general.redo()` | 重做 |
 | `focus_level_editor` | `general.focus_level_editor()` | 聚焦关卡编辑器 |
@@ -747,8 +751,29 @@ sandbox.keybind.add_custom_command(
 
 生成的文件位于：`%USERPROFILE%/Crytek/CRYENGINE_5.7/python/autocomplete/sandbox/`
 
+### flowgraph
+
+| 函式 | 签名 | 说明 |
+|------|------|------|
+| `open_view` | `flowgraph.open_view(str flowGraphName)` | 打开指定名称的 Flow Graph |
+| `open_view_and_select` | `flowgraph.open_view_and_select(str flowGraphName, str entityName)` | 打开指定名称的 Flow Graph 并选取实体节点 |
+
+### layout
+
+| 函式 | 签名 | 说明 |
+|------|------|------|
+| `load` | `layout.load(str path)` | 从文件加载 layout |
+| `save` | `layout.save(str absolutePath)` | 将当前 layout 保存到文件 |
+| `reset` | `layout.reset()` | 重置 layout |
+| `load_dlg` | `layout.load_dlg()` | 打开加载 layout 对话框 |
+| `save_as` | `layout.save_as()` | 打开另存 layout 对话框 |
+
 ---
 ## 20. 其他模块
+
+### terrain
+
+地形命令包含 `import_heightmap`, `export_heightmap`, `make_isle`, `remove_ocean`, `set_ocean_height`, `set_terrain_max_height`, `flatten_light`, `flatten_heavy`, `smooth`, `smooth_slope`, `smooth_beach_coast`, `normalize`, `reduce_range_light`, `reduce_range_heavy`, `erase_terrain`, `resize_terrain`, `invert_heightmap`, `generate_terrain`, `terrain_texture_dialog`, `reload_terrain`, `import_block`, `export_block`, `generate_terrain_texture`, `export_area`, `export_area_with_objects`, `select_terrain`, `export_layers`, `import_layers`, `create_layer`, `delete_layer`, `duplicate_layer`, `move_layer_to_top`, `move_layer_up`, `move_layer_down`, `move_layer_to_bottom`, `flood_layer`, `refine_tiles`。
 
 ### edit_mode
 
@@ -815,7 +840,7 @@ sandbox.keybind.add_custom_command(
 | `bounds` | ((f,f,f),(f,f,f)) | ✓ | — | AABB 边界框 |
 | `selected` | bool | ✓ | ✓ | 是否选取 |
 | `grouped` | bool | ✓ | — | 是否在群组中 |
-| `visible` | bool | ✓ | ✓ | 是否可见 |
+| `visible` | bool | ✓ | ✓ | 源码行为警告：在 CRYENGINE 5.7.1 中此属性实际由 `IsHidden()` / `SetHidden()` 支撑，虽然 Python 属性名叫 visible |
 | `frozen` | bool | ✓ | ✓ | 是否冻结 |
 
 | 方法 | 签名 | 说明 |
@@ -1009,7 +1034,7 @@ sandbox.keybind.add_custom_command(
 | `eType_Vec3` | (float, float, float) |
 | `eType_Vec4` | (float, float, float, float) |
 | `eType_Color` | (float, float, float, float) |
-| `eType_Time` | float |
+| `eType_Time` | 内部时间值（`hour`, `min`） |
 ### 21.14 SPyWrappedClass
 
 类型化的对象包装，包含一个 `type` 枚举和对应的 PyGame* 实例。

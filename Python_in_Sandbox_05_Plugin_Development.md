@@ -33,9 +33,9 @@ Editor/Python/plugins/
 ### 1.3 Load Order
 
 1. `crytools` — Loaded first
-2. Other plugin directories — Loaded in alphabetical order
+2. Other plugin directories — Enumerated by the filesystem
 
-> **Important:** If your plugin depends on another plugin, name them carefully to control order (e.g., name it `z_my_plugin` to ensure it loads last).
+> **Important:** The source does not sort plugin directories before loading them. If your plugin depends on another plugin, make the dependency explicit in startup code instead of relying on alphabetical order.
 
 ---
 
@@ -139,7 +139,8 @@ class PluginCore:
         for i in range(count):
             x = i * spacing
             name = "BatchObj_{:03d}".format(i)
-            sandbox.general.create_object("Brush", "Objects/box.cgf", name, (x, 0, 0))
+            obj = sandbox.general.create_object("Brush", "Objects/box.cgf", name, (x, 0, 0))
+            sandbox.general.log("Created " + obj.name)
         log("Created {} objects".format(count))
 ```
 
@@ -543,6 +544,28 @@ else:
 ```
 
 > **Note:** Sandbox's built-in `_CryQt` only exposes custom Qt classes (such as `QToolWindowManager`), not the full PySide2. To use the full Qt API, install PySide2 (see [04 — Third Party Packages](Python_in_Sandbox_04_Third_Party_Packages.md)).
+
+To register a PySide2 `QWidget` subclass as a Sandbox pane, use the `SandboxBridge` helper:
+
+```python
+from PySide2 import QtWidgets
+import SandboxBridge
+
+class MyTool(QtWidgets.QWidget):
+    def __init__(self):
+        super(MyTool, self).__init__()
+        layout = QtWidgets.QVBoxLayout(self)
+        layout.addWidget(QtWidgets.QLabel("My Tool"))
+
+SandboxBridge.register_window(
+    MyTool,
+    "My Tool",
+    category="Python",
+    needs_menu_item=True,
+    menu_path="Python",
+    unique=True
+)
+```
 
 ### 7.3 Using Dialogs to Collect Input
 

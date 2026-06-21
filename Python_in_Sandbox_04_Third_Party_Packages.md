@@ -17,13 +17,13 @@ Sandbox's embedded Python is CPython 3.7, so third-party packages from PyPI can 
 | site-packages | `C:\Python37\Lib\site-packages\` | `Editor/Python/Windows/Lib/site-packages/` |
 | pip | Built-in | None (manual handling required) |
 | venv | Supported | Not supported (overridden by Py_SetPythonHome) |
-| sys.path | Automatically includes site-packages | Must be added manually |
+| sys.path | Automatically includes site-packages | Uses the embedded Python home; custom external package folders must be added manually |
 
 ### 1.2 Core Limitations
 
-1. **Py_SetPythonHome** is set to `Editor/Python/Windows/`, which determines where Python looks for `site-packages`
-2. **No built-in pip** — embedded Python does not include pip
-3. **No venv** — because Py_SetPythonHome overrides the standard site lookup logic
+1. **Py_SetPythonHome** is set to `Editor/Python/Windows/`, which determines where Python looks for the standard library and its own `Lib/site-packages`
+2. **No bundled pip in this embedded tree** — use an external Python 3.7 installation for package installation
+3. **No in-Sandbox venv activation** — use a standard external venv and add its `Lib/site-packages` path if needed
 4. **Python 3.7 only** — packages must support Python 3.7
 5. **x64 architecture** — packages containing C extensions (`.pyd`) must be compiled for x64
 
@@ -455,7 +455,7 @@ C:\Python37\python.exe -m pip install --target="%TARGET%" <package>
 
 ### Q: Conflict with Built-in PySide2
 
-Sandbox already has built-in PySide2 (used for `_CryQt`). Installing a standalone PySide2 may cause conflicts.
+Sandbox uses PySide2/Shiboken2 for `_CryQt` and for `SandboxBridge` QWidget integration. Installing a different PySide2 into the embedded tree may cause DLL or ABI conflicts.
 
 **Solution:**
 - Prefer using the built-in `import _CryQt` or `import CryQt`

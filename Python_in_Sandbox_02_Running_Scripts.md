@@ -13,7 +13,7 @@ Sandbox provides multiple ways to execute Python code:
 |--------|-------------|----------|
 | Python Scripts panel | GUI panel to browse and execute `.py` files | Interactive operation |
 | `general.run_file()` | Run a script file from Python or Console | Calling other scripts from within a script |
-| `general.run_file_parameters()` | Run a script file with parameters | Scripts that need parameters |
+| `general.run_file_parameters()` | Run a script file with whitespace-separated parameters | Scripts that need simple parameters |
 | `general.execute_command()` | Execute an editor command | Calling editor functions from Python |
 | `python.execute` | Execute a Python string directly | Short code snippets |
 | Plugin auto-load | Automatically execute `startup.py` on startup | Resident plugins |
@@ -95,7 +95,7 @@ sandbox.general.run_file("C:/Projects/MyGame/Scripts/setup.py")
 
 ### 3.2 `general.run_file_parameters()`
 
-Executes a script with parameters, separated by spaces.
+Executes a script with parameters separated by whitespace. The implementation does not do shell-style parsing, so quoted strings containing spaces are still split.
 
 ```python
 import sandbox
@@ -189,7 +189,7 @@ Editor/
     plugins/
       crytools/              ← Loaded first
         startup.py
-      my_plugin/             ← Loaded alphabetically after
+      my_plugin/             ← Loaded after crytools (filesystem enumeration order)
         startup.py
         helpers.py
         config.json
@@ -214,7 +214,7 @@ Sandbox startup complete
     │      LoadPluginFromPath("Editor/Python/plugins/crytools")
     │      → Find startup.py → execute general.run_file
     │
-    └── 3. Enumerate other subdirectories (alphabetical order)
+    └── 3. Enumerate other subdirectories (filesystem enumeration order)
             For each subdirectory, call LoadPluginFromPath()
             → Find startup.py → execute
 ```
@@ -290,7 +290,7 @@ sandbox.general.log("This goes to the editor console")
 print("This also appears in the console")
 
 # Method 3: general.draw_label (displays 2D text in the viewport)
-sandbox.general.draw_label(100, 100, 1.0, 0.0, 0.0, 1.0, "Hello on screen")
+sandbox.general.draw_label(100, 100, 1.0, 1.0, 0.0, 0.0, 1.0, "Hello on screen")
 ```
 
 ### 6.2 Output Redirection Mechanism
@@ -360,7 +360,8 @@ import sandbox
 for i in range(10):
     x = i * 5.0
     name = "Pillar_{:02d}".format(i)
-    sandbox.general.create_object("Brush", "Objects/pillar.cgf", name, (x, 0.0, 0.0))
+    obj = sandbox.general.create_object("Brush", "Objects/pillar.cgf", name, (x, 0.0, 0.0))
+    sandbox.general.log("Created " + obj.name)
 
 sandbox.general.log("Created 10 pillars")
 ```

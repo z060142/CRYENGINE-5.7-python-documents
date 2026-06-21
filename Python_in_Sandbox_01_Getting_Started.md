@@ -74,7 +74,7 @@ If you want to compile Sandbox from source with Python support, you need:
 | Python SDK | `${SDK_DIR}/Python/include/` | Python header files |
 | Python lib | `${SDK_DIR}/Python/x64/libs/python37.lib` | Link library (Debug: `python37_d.lib`) |
 | Boost.Python | Integrated into the engine | No separate installation required |
-| PySide2 / Shiboken2 | Used for `_CryQt.pyd` compilation | Optional, for Qt bindings |
+| PySide2 / Shiboken2 | Used for `_CryQt.pyd` and the Sandbox Python Bridge | Required for Qt/Python bridge builds |
 
 Relevant CMakeLists.txt settings:
 - `Code/Sandbox/EditorQt/CMakeLists.txt` — links the `Python` library
@@ -211,14 +211,14 @@ After saving, launch Sandbox and the script will run automatically.
 import sandbox
 
 # Create a Brush object
-obj_name = sandbox.general.create_object(
+obj = sandbox.general.create_object(
     "Brush",                    # Object class
     "Objects/test.cgf",         # Model file
     "MyTestObject",             # Object name
     (100.0, 50.0, 0.0)         # Position (x, y, z)
 )
 
-sandbox.general.log("Created object: " + str(obj_name))
+sandbox.general.log("Created object: " + obj.name)
 ```
 
 ### 5.3 Selecting and Manipulating Objects
@@ -313,7 +313,7 @@ Editor/
         startup.py    <-- Must be named exactly this
 ```
 
-The `crytools` plugin loads first, other plugins load in alphabetical order.
+The `crytools` plugin loads first. Other plugin directories are enumerated by the filesystem, so do not rely on alphabetical order for plugin dependencies.
 
 ### Issue: Importing Third-Party Packages Fails
 
